@@ -1,0 +1,68 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <vector>
+#include <cstring>
+
+#define MAX 10
+
+class GrafoMatriz {
+private:
+    int matrizAdj[MAX][MAX];
+    int V; 
+
+public:
+    GrafoMatriz(int v) {
+        V = v;
+        memset(matrizAdj, 0, sizeof(matrizAdj)); 
+    }
+
+    void adicionarAresta(int u, int v) {
+        matrizAdj[u][v] = 1;
+        matrizAdj[v][u] = 1; 
+    }
+
+    void BFS(int inicio) {
+        bool visitado[MAX] = {false};
+        std::queue<int> q;
+        visitado[inicio] = true;
+        q.push(inicio);
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            std::cout << u << " ";
+
+            for (int v = 0; v < V; ++v) {
+                if (matrizAdj[u][v] == 1 && !visitado[v]) {
+                    visitado[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    void DFS(int inicio) {
+        bool visitado[MAX] = {false};
+        std::stack<int> s;
+        s.push(inicio);
+
+        while (!s.empty()) {
+            int u = s.top();
+            s.pop();
+
+            if (!visitado[u]) {
+                std::cout << u << " ";
+                visitado[u] = true;
+            }
+
+            for (int v = V - 1; v >= 0; --v) { 
+                if (matrizAdj[u][v] == 1 && !visitado[v]) {
+                    s.push(v);
+                }
+            }
+        }
+        std::cout << std::endl;
+    }
+};
