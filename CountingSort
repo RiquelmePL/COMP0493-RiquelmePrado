@@ -1,0 +1,22 @@
+#include <iostream>
+#include <vector>
+#include <algorithm> 
+
+using namespace std;
+
+void countingSort(vector<int>& A, vector<int>& B, int n, int k) {
+    vector<int> C(k + 1, 0);  // Inicializa com 0
+
+    for (int i = 0; i < n; ++i) {
+        C[A[i]]++;
+    }
+
+    for (int i = 1; i <= k; ++i) {
+        C[i] += C[i - 1];
+    }
+
+    for (int i = n - 1; i >= 0; --i) {
+        B[C[A[i]] - 1] = A[i];  // Coloca o elemento na posição correta
+        C[A[i]]--;  // Diminui a posição para lidar com elementos repetidos
+    }
+}
