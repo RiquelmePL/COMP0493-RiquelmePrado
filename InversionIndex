@@ -1,0 +1,51 @@
+#include <stdio.h>
+
+int mergeInv(int vetor[], int esquerda, int meio, int direita) {
+    int n1 = meio - esquerda + 1;
+    int n2 = direita - meio;
+    int L[n1], R[n2];
+    int inversoes = 0;
+
+    for (int i = 0; i < n1; i++)
+        L[i] = vetor[esquerda + i];
+    for (int i = 0; i < n2; i++)
+        R[i] = vetor[meio + 1 + i];
+
+    int i = 0, j = 0, k = esquerda;
+    while (i < n1 && j < n2) {
+        if (L[i] <= R[j]) {
+            vetor[k] = L[i];
+            i++;
+        } else {
+            vetor[k] = R[j];
+            inversoes += (n1 - i);  // Contabiliza inversões
+            j++;
+        }
+        k++;
+    }
+
+    while (i < n1) {
+        vetor[k] = L[i];
+        i++;
+        k++;
+    }
+
+    while (j < n2) {
+        vetor[k] = R[j];
+        j++;
+        k++;
+    }
+
+    return inversoes;
+}
+
+int mergeSortInv(int vetor[], int esquerda, int direita) {
+    int inversoes = 0;
+    if (esquerda < direita) {
+        int meio = esquerda + (direita - esquerda) / 2;
+        inversoes += mergeSortInv(vetor, esquerda, meio);
+        inversoes += mmergeSortInv(vetor, meio + 1, direita);
+        inversoes += mergeInv(vetor, esquerda, meio, direita);
+    }
+    return inversoes;
+}
