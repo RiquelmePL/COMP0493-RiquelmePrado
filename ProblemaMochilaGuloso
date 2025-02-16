@@ -1,0 +1,29 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+struct Item {
+    double peso;
+    double valor;
+    double valorPorPeso;
+};
+
+bool comparar(Item a, Item b) {
+    return a.valorPorPeso > b.valorPorPeso;
+}
+
+double mochilaFracionaria(std::vector<Item>& itens, double capacidade) {
+    double valorTotal = 0.0;
+    for (auto& item : itens) {
+        if (capacidade == 0) break;
+
+        if (item.peso <= capacidade) {
+            capacidade -= item.peso;
+            valorTotal += item.valor;
+        } else {
+            valorTotal += item.valorPorPeso * capacidade;
+            capacidade = 0;
+        }
+    }
+    return valorTotal;
+}
