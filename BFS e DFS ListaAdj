@@ -1,0 +1,65 @@
+#include <iostream>
+#include <queue>
+#include <stack>
+#include <vector>
+
+class GrafoLista {
+private:
+    std::vector<int> *listaAdj;
+    int V;
+
+public:
+    GrafoLista(int v) {
+        V = v;
+        listaAdj = new std::vector<int>[V]; 
+    }
+
+    void adicionarAresta(int u, int v) {
+        listaAdj[u].push_back(v);
+        listaAdj[v].push_back(u); 
+    }
+
+    void BFS(int inicio) {
+        bool visitado[V] = {false};
+        std::queue<int> q;
+        visitado[inicio] = true;
+        q.push(inicio);
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            std::cout << u << " ";
+
+            for (int v : listaAdj[u]) {
+                if (!visitado[v]) {
+                    visitado[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    void DFS(int inicio) {
+        bool visitado[V] = {false};
+        std::stack<int> s;
+        s.push(inicio);
+
+        while (!s.empty()) {
+            int u = s.top();
+            s.pop();
+
+            if (!visitado[u]) {
+                std::cout << u << " ";
+                visitado[u] = true;
+            }
+
+            for (int v = listaAdj[u].size() - 1; v >= 0; --v) {
+                if (!visitado[listaAdj[u][v]]) {
+                    s.push(listaAdj[u][v]);
+                }
+            }
+        }
+        std::cout << std::endl;
+    }
+};
