@@ -1,0 +1,28 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+struct Tarefa {
+    int prazo;
+    int tempo;
+};
+
+bool comparar(Tarefa a, Tarefa b) {
+    return a.prazo < b.prazo;
+}
+
+int escalonamentoDeTarefas(std::vector<Tarefa>& tarefas) {
+    std::sort(tarefas.begin(), tarefas.end(), comparar);
+    
+    int tempoTotal = 0;
+    int tarefasRealizadas = 0;
+
+    for (const auto& tarefa : tarefas) {
+        if (tempoTotal + tarefa.tempo <= tarefa.prazo) {
+            tempoTotal += tarefa.tempo;
+            tarefasRealizadas++;
+        }
+    }
+
+    return tarefasRealizadas;
+}
