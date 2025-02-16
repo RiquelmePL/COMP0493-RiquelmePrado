@@ -1,0 +1,26 @@
+#include <stdio.h>
+#include <string.h>
+
+int findLCP(char str1[], char str2[], int left, int right) {
+    int i = 0;
+    while (str1[left + i] == str2[left + i] && str1[left + i] != '\0' && str2[left + i] != '\0') {
+        i++;
+    }
+    return i;
+}
+
+int longestCommonPrefixUtil(char strs[][100], int left, int right) {
+    if (left == right) {
+        return strlen(strs[left]);
+    } else {
+        int mid = left + (right - left) / 2;
+        int lcpLeft = longestCommonPrefixUtil(strs, left, mid);
+        int lcpRight = longestCommonPrefixUtil(strs, mid + 1, right);
+        
+        return findLCP(strs, strs, left, right);
+    }
+}
+
+int longestCommonPrefix(char strs[][100], int n) {
+    return longestCommonPrefixUtil(strs, 0, n - 1);
+}
