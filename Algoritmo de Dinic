@@ -1,0 +1,73 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+using namespace std;
+
+struct Edge {
+    int to, rev, capacidade, fluxo;
+};
+
+class Grafo {
+    int V;
+    vector<int> nivel, ptr;
+    vector<vector<Edge>> adj;
+
+public:
+    Grafo(int V) : V(V), adj(V) {}
+
+    void addAresta(int u, int v, int cap) {
+        Edge a{v, (int)adj[v].size(), cap, 0};
+        Edge b{u, (int)adj[u].size(), 0, 0};
+        adj[u].push_back(a);
+        adj[v].push_back(b);
+    }
+
+    bool bfs(int s, int t) {
+        nivel.assign(V, -1);
+        queue<int> q;
+        nivel[s] = 0;
+        q.push(s);
+
+        while (!q.empty()) {
+            int u = q.front();
+            q.pop();
+            for (Edge &e : adj[u]) {
+                if (nivel[e.to] < 0 && e.fluxo < e.capacidade) {
+                    nivel[e.to] = nivel[u] + 1;
+                    q.push(e.to);
+                }
+            }
+        }
+        return nivel[t] >= 0;
+    }
+
+    int dfs(int u, int t, int fluxo) {
+        if (u == t) return fluxo;
+        for (int &i = ptr[u]; i < adj[u].size(); i++) {
+            Edge &e = adj[u][i];
+            if (nivel[e.to] == nivel[u] + 1 && e.fluxo < e.capacidade) {
+                int atual_fluxo = min(fluxo, e.capacidade - e.fluxo);
+                int temp_fluxo = dfs(e.to, t, atual_fluxo);
+                if (temp_fluxo > 0) {
+                    e.fluxo += temp_fluxo;
+                    adj[e.to][e.rev].fluxo -= temp_fluxo;
+                    return temp_fluxo;
+                }
+            }
+        }
+        return 0;
+    }
+
+    int dinic(int s, int t) {
+        if (s == t) return -1;
+        int max_fluxo = 0;
+        while (bfs(s, t)) {
+            ptr.assign(V, 0);
+            while (int fluxo = dfs(s, t, INT_MAX)) {
+                max_fluxo += fluxo;
+            }
+        }
+        return max_fluxo;
+    }
+};
