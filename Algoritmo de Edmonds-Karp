@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+using namespace std;
+
+class Grafo {
+    int V;
+    vector<vector<int>> capacidade;
+    vector<vector<int>> adj;
+
+public:
+    Grafo(int V) : V(V), capacidade(V, vector<int>(V, 0)), adj(V) {}
+
+    void addAresta(int u, int v, int cap) {
+        adj[u].push_back(v);
+        adj[v].push_back(u);
+        capacidade[u][v] = cap;
+    }
+
+    int edmondsKarp(int s, int t) {
+        int max_fluxo = 0;
+        vector<vector<int>> fluxo(V, vector<int>(V, 0));
+        vector<int> parent(V);
+
+        while (true) {
+            fill(parent.begin(), parent.end(), -1);
+            parent[s] = -2;
+            queue<pair<int, int>> q;
+            q.push({s, INT_MAX});
+
+            while (!q.empty()) {
+                int u = q.front().first;
+                int atual_fluxo = q.front().second;
+                q.pop();
+
+                for (int v : adj[u]) {
+                    if (parent[v] == -1 && capacidade[u][v] > fluxo[u][v]) {
+                        parent[v] = u;
+                        int novo_fluxo = min(atual_fluxo, capacidade[u][v] - fluxo[u][v]);
+                        if (v == t) {
+                            max_fluxo += novo_fluxo;
+                            for (int x = t; x != s; x = parent[x]) {
+                                fluxo[parent[x]][x] += novo_fluxo;
+                                fluxo[x][parent[x]] -= novo_fluxo;
+                            }
+                            break;
+                        }
+                        q.push({v, novo_fluxo});
+                    }
+                }
+            }
+            if (parent[t] == -1) break;
+        }
+        return max_fluxo;
+    }
+};
