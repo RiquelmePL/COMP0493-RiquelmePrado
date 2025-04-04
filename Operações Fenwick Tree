@@ -1,0 +1,40 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class FenwickTree {
+private:
+    vector<int> tree;
+    int n;
+
+public:
+    FenwickTree(int size) : n(size), tree(size + 1, 0) {}
+
+    void build(const vector<int>& arr) {
+        for (int i = 0; i < n; ++i) {
+            update(i, arr[i]);
+        }
+    }
+
+    void update(int index, int delta) {
+        index++; // Convertendo para 1-based
+        while (index <= n) {
+            tree[index] += delta;
+            index += index & -index;
+        }
+    }
+
+    int query(int index) {
+        index++; // Convertendo para 1-based
+        int sum = 0;
+        while (index > 0) {
+            sum += tree[index];
+            index -= index & -index;
+        }
+        return sum;
+    }
+
+    int rangeQuery(int l, int r) {
+        return query(r) - query(l - 1);
+    }
+};
