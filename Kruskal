@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+struct Edge {
+    int u, v, weight;
+    bool operator<(Edge const& other) const {
+        return weight < other.weight;
+    }
+};
+
+class UnionFind {
+private:
+    vector<int> parent, rank;
+
+public:
+    UnionFind(int n) {
+        parent.resize(n);
+        rank.resize(n, 0);
+        for(int i = 0; i < n; i++) parent[i] = i;
+    }
+
+    int find(int u) {
+        if (u != parent[u])
+            parent[u] = find(parent[u]);
+        return parent[u];
+    }
+
+    bool unite(int u, int v) {
+        u = find(u);
+        v = find(v);
+        if (u == v) return false;
+
+        if (rank[u] < rank[v])
+            swap(u, v);
+        parent[v] = u;
+        if (rank[u] == rank[v])
+            rank[u]++;
+        return true;
+    }
+};
+
+int kruskal(int n, vector<Edge>& edges) {
+    sort(edges.begin(), edges.end());
+    UnionFind uf(n);
+    int cost = 0;
+
+    for (Edge e : edges) {
+        if (uf.unite(e.u, e.v)) {
+            cost += e.weight;
+            // cout << e.u << " - " << e.v << " : " << e.weight << endl;
+        }
+    }
+
+    return cost;
+}
