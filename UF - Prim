@@ -1,0 +1,29 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+typedef pair<int, int> pii;
+
+int prim(int n, vector<vector<pii>>& adj) {
+    vector<bool> visited(n, false);
+    priority_queue<pii, vector<pii>, greater<pii>> pq;
+
+    pq.push({0, 0}); // {weight, node}
+    int cost = 0;
+
+    while (!pq.empty()) {
+        auto [w, u] = pq.top(); pq.pop();
+        if (visited[u]) continue;
+
+        visited[u] = true;
+        cost += w;
+
+        for (auto [v, weight] : adj[u]) {
+            if (!visited[v])
+                pq.push({weight, v});
+        }
+    }
+
+    return cost;
+}
