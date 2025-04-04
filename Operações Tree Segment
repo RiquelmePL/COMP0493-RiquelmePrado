@@ -1,0 +1,143 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+using namespace std;
+
+struct Node {
+    int sum;
+    int min;
+    int max;
+};
+
+class SegmentTree {
+private:
+    vector<Node> tree;
+    vector<int> lazy;
+    int n;
+
+    void build(const vector<int>& arr, int node, int start, int end) {
+        if (start == end) {
+            tree[node] = {arr[start], arr[start], arr[start]};
+        } else {
+            int mid = (start + end) / 2;
+            build(arr, 2 * node + 1, start, mid);
+            build(arr, 2 * node + 2, mid + 1, end);
+            tree[node].sum = tree[2 * node + 1].sum + tree[2 * node + 2].sum;
+            tree[node].min = min(tree[2 * node + 1].min, tree[2 * node + 2].min);
+            tree[node].max = max(tree[2 * node + 1].max, tree[2 * node + 2].max);
+        }
+    }
+
+    void push(int node, int start, int end) {
+        if (lazy[node] != 0) {
+            // Atualiza o nó atual
+            tree[node].sum += (end - start + 1) * lazy[node];
+            tree[node].min += lazy[node];
+            tree[node].max += lazy[node];
+            
+            // Se não for folha, marca os filhos como pendentes
+            if (start != end) {
+                lazy[2 * node + 1] += lazy[node];
+                lazy[2 * node + 2] += lazy[node];
+            }
+            
+            lazy[node] = 0;
+        }
+    }
+
+    void update(int node, int start, int end, int idx, int val) {
+        if (start == end) {
+            tree[node] = {val, val, val};
+        } else {
+            int mid = (start + end) / 2;
+            if (idx <= mid) {
+                update(2 * node + 1, start, mid, idx, val);
+            } else {
+                update(2 * node + 2, mid + 1, end, idx, val);
+            }
+            tree[node].sum = tree[2 * node + 1].sum + tree[2 * node + 2].sum;
+            tree[node].min = min(tree[2 * node + 1].min, tree[2 * node + 2].min);
+            tree[node].max = max(tree[2 * node + 1].max, tree[2 * node + 2].max);
+        }
+    }
+
+    void rangeUpdate(int node, int start, int end, int l, int r, int val) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return;
+        
+        if (l <= start && end <= r) {
+            lazy[node] += val;
+            push(node, start, end);
+            return;
+        }
+        
+        int mid = (start + end) / 2;
+        rangeUpdate(2 * node + 1, start, mid, l, r, val);
+        rangeUpdate(2 * node + 2, mid + 1, end, l, r, val);
+        
+        tree[node].sum = tree[2 * node + 1].sum + tree[2 * node + 2].sum;
+        tree[node].min = min(tree[2 * node + 1].min, tree[2 * node + 2].min);
+        tree[node].max = max(tree[2 * node + 1].max, tree[2 * node + 2].max);
+    }
+
+    int querySum(int node, int start, int end, int l, int r) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return 0;
+        if (l <= start && end <= r) return tree[node].sum;
+        
+        int mid = (start + end) / 2;
+        return querySum(2 * node + 1, start, mid, l, r) + 
+               querySum(2 * node + 2, mid + 1, end, l, r);
+    }
+
+    int queryMin(int node, int start, int end, int l, int r) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return INT_MAX;
+        if (l <= start && end <= r) return tree[node].min;
+        
+        int mid = (start + end) / 2;
+        return min(queryMin(2 * node + 1, start, mid, l, r),
+                   queryMin(2 * node + 2, mid + 1, end, l, r));
+    }
+
+    int queryMax(int node, int start, int end, int l, int r) {
+        push(node, start, end);
+        
+        if (start > r || end < l) return INT_MIN;
+        if (l <= start && end <= r) return tree[node].max;
+        
+        int mid = (start + end) / 2;
+        return max(queryMax(2 * node + 1, start, mid, l, r),
+                   queryMax(2 * node + 2, mid + 1, end, l, r));
+    }
+
+public:
+    SegmentTree(const vector<int>& arr) : n(arr.size()) {
+        tree.resize(4 * n);
+        lazy.resize(4 * n, 0);
+        build(arr, 0, 0, n - 1);
+    }
+
+    void update(int idx, int val) {
+        update(0, 0, n - 1, idx, val);
+    }
+
+    void rangeUpdate(int l, int r, int val) {
+        rangeUpdate(0, 0, n - 1, l, r, val);
+    }
+
+    int querySum(int l, int r) {
+        return querySum(0, 0, n - 1, l, r);
+    }
+
+    int queryMin(int l, int r) {
+        return queryMin(0, 0, n - 1, l, r);
+    }
+
+    int queryMax(int l, int r) {
+        return queryMax(0, 0, n - 1, l, r);
+    }
+};
